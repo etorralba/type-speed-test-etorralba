@@ -1,10 +1,15 @@
-import dotenv from "dotenv";
-import server from "./server";
+import express, { Express, Request, Response } from "express";
+import dotenv from 'dotenv';
 
 dotenv.config();
 
-const port = process.env.PORT;
+const app: Express = express();
+const port = process.env.PORT
 
-server.listen(port, () => {
-  console.log(`⚡ [server]: Server is runing at http://localhost:${port}`);
+app.get('/', (req: Request, res: Response) => {
+    res.send('Express + Typescrypt Server');
 });
+
+app.listen(port, ()=>{
+    console.log(`⚡ [server]: Server is runing at http://localhost:${port}`)
+})

@@ -1,5 +1,6 @@
-import React from "react";
-import Head from "next/head";
+import React from 'react'
+import Head from 'next/head'
+import TypeParagraph from '../components/TypeParagraph/TypeParagraph'
 
 const IndexPage = () => {
   return (
@@ -10,8 +11,9 @@ const IndexPage = () => {
         <meta name="keywords" content="next.js, react, javascript" />
       </Head>
       <h1>This is the content of my page</h1>
+      <TypeParagraph text="Hello World!"></TypeParagraph>
     </div>
-  );
-};
+  )
+}
 
-export default IndexPage;
+export default IndexPage

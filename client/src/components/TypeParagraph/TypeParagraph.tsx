@@ -5,7 +5,9 @@ type TypeParagraphProps = {
 }
 
 const TypeParagraph = (props: TypeParagraphProps) => {
-  let listText = props.text.split('')
+  // let listText = props.text.split('')
+  let listText = 'props\nHello'.split('')
+  console.log(listText)
 
   // State for keys pressed and current character
   const [keysPressed, setKeysPressed] = useState<string[]>([])
@@ -19,6 +21,7 @@ const TypeParagraph = (props: TypeParagraphProps) => {
     // Event listener to handle key presses
     const handleKeyDown = (event: KeyboardEvent) => {
       const { key } = event
+
       const isSpecialKey = [
         'Shift',
         'Control',
@@ -35,7 +38,7 @@ const TypeParagraph = (props: TypeParagraphProps) => {
 
       if (!isSpecialKey) {
         if (
-          event.key == currentCharacter.key &&
+          parseKeys(key) == currentCharacter.key &&
           keysPressed.length == 0 &&
           currentCharacter.position != listText.length - 1
         ) {
@@ -51,9 +54,21 @@ const TypeParagraph = (props: TypeParagraphProps) => {
       }
     }
 
+    // Parse special keys to string value
+    const parseKeys = (key: string) => {
+      let parsedKey: string
+      if (key == 'Enter') {
+        parsedKey = '\n'
+      } else {
+        parsedKey = key
+      }
+      return parsedKey
+    }
+
     // Moves to the next character and updates state
     const moveToNextCharacter = () => {
       const newPosition = currentCharacter.position + 1
+
       setCurrentCharacter({
         key: listText[newPosition],
         position: newPosition,
@@ -76,7 +91,13 @@ const TypeParagraph = (props: TypeParagraphProps) => {
 
     // Handles an incorrect key press and updates state
     const handleIncorrectKey = (key: string) => {
-      setKeysPressed((prevKeys) => [...prevKeys, key])
+      let parsedKey: string
+      if (key == 'Enter') {
+        parsedKey = '\n'
+      } else {
+        parsedKey = key
+      }
+      setKeysPressed((prevKeys) => [...prevKeys, parsedKey])
     }
 
     const calculateDisplayText = () => {
@@ -104,22 +125,13 @@ const TypeParagraph = (props: TypeParagraphProps) => {
   }, [keysPressed, currentCharacter, displayText])
 
   return (
-    <span className="">
+    <span className="bg-slate-400">
       {displayText.map((char, index) => {
-        if (index == currentCharacter.position) {
-          keysPressed.length > 0
-            ? keysPressed.map((char, index) => {
-                return (
-                  <span key={char + index} className="">
-                    {char}
-                  </span>
-                )
-              })
-            : ''
-        }
+        // Correct Typed Words
         return (
-          <span key={char + index} className="">
+          <span className="bg-slate-600" key={char + index}>
             {char}
+            {char == '\n' ? <br /> : <></>}
           </span>
         )
       })}

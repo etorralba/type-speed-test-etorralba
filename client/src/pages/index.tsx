@@ -10,7 +10,7 @@ const IndexPage = () => {
         <meta name="description" content="This is the description of my page" />
         <meta name="keywords" content="next.js, react, javascript" />
       </Head>
-      <h1>This is the content of my page</h1>
+      <h1 className="">This is the content of my page</h1>
       <TypeParagraph text="Hello World!"></TypeParagraph>
     </div>
   )

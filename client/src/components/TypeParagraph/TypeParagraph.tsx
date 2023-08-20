@@ -8,11 +8,8 @@ const TypeParagraph = (props: TypeParagraphProps) => {
   const listText = props.text.split('')
 
   // State for keys pressed and current character
-  const [keysPressed, setKeysPressed] = useState<string[]>([])
-  const [currentCharacter, setCurrentCharacter] = useState({
-    key: listText[0],
-    position: 0,
-  })
+  const [typedCharacters, setTypedCharacters] = useState<string[]>([])
+  const [currentCharacterIndex, setCurrentCharacterIndex] = useState(0)
   const [displayText, setDisplayText] = useState<string[]>([...listText])
 
   useEffect(() => {
@@ -35,8 +32,8 @@ const TypeParagraph = (props: TypeParagraphProps) => {
       const { key } = event
       if (!SPECIAL_KEYS.includes(key)) {
         if (
-          parseKeys(key) === currentCharacter.key &&
-          keysPressed.length === 0
+          parseKeys(key) === listText[currentCharacterIndex] &&
+          typedCharacters.length === 0
         ) {
           moveToNextCharacter()
         } else if (key === 'Backspace') {
@@ -54,11 +51,8 @@ const TypeParagraph = (props: TypeParagraphProps) => {
 
     // Moves to the next character and updates state
     const moveToNextCharacter = () => {
-      const newPosition = currentCharacter.position + 1
-      setCurrentCharacter({
-        key: listText[newPosition],
-        position: newPosition,
-      })
+      const newPosition = currentCharacterIndex + 1
+      setCurrentCharacterIndex(newPosition)
 
       if (newPosition === listText.length) {
         console.log('Test ended!')
@@ -67,21 +61,20 @@ const TypeParagraph = (props: TypeParagraphProps) => {
 
     // Handles the Backspace key press and updates state
     const handleBackSpace = () => {
-      if (keysPressed.length > 0) {
-        setKeysPressed((prevItems) => prevItems.slice(0, prevItems.length - 1))
+      if (typedCharacters.length > 0) {
+        setTypedCharacters((prevItems) =>
+          prevItems.slice(0, prevItems.length - 1)
+        )
       } else {
         const newPosition =
-          currentCharacter.position == 0 ? 0 : currentCharacter.position - 1
-        setCurrentCharacter({
-          key: listText[newPosition],
-          position: newPosition,
-        })
+          currentCharacterIndex == 0 ? 0 : currentCharacterIndex - 1
+        setCurrentCharacterIndex(newPosition)
       }
     }
 
     // Handles an incorrect key press and updates state
     const handleIncorrectKey = (key: string) => {
-      setKeysPressed((prevKeys) => [...prevKeys, parseKeys(key)])
+      setTypedCharacters((prevKeys) => [...prevKeys, parseKeys(key)])
     }
 
     const calculateDisplayText = () => {
@@ -89,10 +82,11 @@ const TypeParagraph = (props: TypeParagraphProps) => {
       const newDisplayText = [...listText]
 
       // Insert the keysPressed characters at the currentCharacter.position
-      newDisplayText.splice(currentCharacter.position, 0, ...keysPressed)
+      newDisplayText.splice(currentCharacterIndex, 0, ...typedCharacters)
 
       // Update the displayText state using the calculated newDisplayText
       setDisplayText(newDisplayText)
+      console.log(newDisplayText)
     }
 
     document.addEventListener('keydown', handleKeyDown)
@@ -101,20 +95,21 @@ const TypeParagraph = (props: TypeParagraphProps) => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [currentCharacter, keysPressed])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentCharacterIndex, typedCharacters])
 
   return (
     <span className="">
       {displayText.map((char, index) => {
-        const keyPressedLength = keysPressed.length
+        const keyPressedLength = typedCharacters.length
         let charStyle: string
         if (
-          index <= currentCharacter.position + keyPressedLength - 1 &&
-          index >= currentCharacter.position
+          index <= currentCharacterIndex + keyPressedLength - 1 &&
+          index >= currentCharacterIndex
         ) {
           // Wrong
           charStyle = `bg-red-400`
-        } else if (index < currentCharacter.position) {
+        } else if (index < currentCharacterIndex) {
           // Correct
           charStyle = `bg-green-400`
         } else {

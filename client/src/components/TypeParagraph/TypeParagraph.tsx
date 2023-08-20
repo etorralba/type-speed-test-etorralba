@@ -5,9 +5,7 @@ type TypeParagraphProps = {
 }
 
 const TypeParagraph = (props: TypeParagraphProps) => {
-  // let listText = props.text.split('')
-  let listText = 'props\nHello'.split('')
-  console.log(listText)
+  const listText = props.text.split('')
 
   // State for keys pressed and current character
   const [keysPressed, setKeysPressed] = useState<string[]>([])
@@ -18,36 +16,31 @@ const TypeParagraph = (props: TypeParagraphProps) => {
   const [displayText, setDisplayText] = useState<string[]>([...listText])
 
   useEffect(() => {
+    const SPECIAL_KEYS = [
+      'Shift',
+      'Control',
+      'Alt',
+      'ArrowUp',
+      'ArrowDown',
+      'ArrowLeft',
+      'ArrowRight',
+      'Tab',
+      'CapsLock',
+      'Meta',
+      'Unidentified',
+    ]
+
     // Event listener to handle key presses
     const handleKeyDown = (event: KeyboardEvent) => {
       const { key } = event
-
-      const isSpecialKey = [
-        'Shift',
-        'Control',
-        'Alt',
-        'ArrowUp',
-        'ArrowDown',
-        'ArrowLeft',
-        'ArrowRight',
-        'Tab',
-        'CapsLock',
-        'Meta',
-        'Unidentified',
-      ].includes(key)
-
-      if (!isSpecialKey) {
+      if (!SPECIAL_KEYS.includes(key)) {
         if (
-          parseKeys(key) == currentCharacter.key &&
-          keysPressed.length == 0 &&
-          currentCharacter.position != listText.length - 1
+          parseKeys(key) === currentCharacter.key &&
+          keysPressed.length === 0
         ) {
           moveToNextCharacter()
-        } else if (key == 'Backspace') {
+        } else if (key === 'Backspace') {
           handleBackSpace()
-        } else if (currentCharacter.position == listText.length - 1) {
-          console.log('Test ended!')
-          document.removeEventListener('keydown', handleKeyDown)
         } else {
           handleIncorrectKey(key)
         }
@@ -56,23 +49,20 @@ const TypeParagraph = (props: TypeParagraphProps) => {
 
     // Parse special keys to string value
     const parseKeys = (key: string) => {
-      let parsedKey: string
-      if (key == 'Enter') {
-        parsedKey = '\n'
-      } else {
-        parsedKey = key
-      }
-      return parsedKey
+      return key === 'Enter' ? '\n' : key
     }
 
     // Moves to the next character and updates state
     const moveToNextCharacter = () => {
       const newPosition = currentCharacter.position + 1
-
       setCurrentCharacter({
         key: listText[newPosition],
         position: newPosition,
       })
+
+      if (newPosition === listText.length) {
+        console.log('Test ended!')
+      }
     }
 
     // Handles the Backspace key press and updates state
@@ -91,13 +81,7 @@ const TypeParagraph = (props: TypeParagraphProps) => {
 
     // Handles an incorrect key press and updates state
     const handleIncorrectKey = (key: string) => {
-      let parsedKey: string
-      if (key == 'Enter') {
-        parsedKey = '\n'
-      } else {
-        parsedKey = key
-      }
-      setKeysPressed((prevKeys) => [...prevKeys, parsedKey])
+      setKeysPressed((prevKeys) => [...prevKeys, parseKeys(key)])
     }
 
     const calculateDisplayText = () => {
@@ -119,17 +103,27 @@ const TypeParagraph = (props: TypeParagraphProps) => {
     }
   }, [currentCharacter, keysPressed])
 
-  useEffect(() => {
-    console.log(keysPressed)
-    console.log(currentCharacter)
-  }, [keysPressed, currentCharacter, displayText])
-
   return (
-    <span className="bg-slate-400">
+    <span className="">
       {displayText.map((char, index) => {
-        // Correct Typed Words
+        const keyPressedLength = keysPressed.length
+        let charStyle: string
+        if (
+          index <= currentCharacter.position + keyPressedLength - 1 &&
+          index >= currentCharacter.position
+        ) {
+          // Wrong
+          charStyle = `bg-red-400`
+        } else if (index < currentCharacter.position) {
+          // Correct
+          charStyle = `bg-green-400`
+        } else {
+          // Remaining
+          charStyle = `bg-gray-400`
+        }
+
         return (
-          <span className="bg-slate-600" key={char + index}>
+          <span className={charStyle} key={char + index}>
             {char}
             {char == '\n' ? <br /> : <></>}
           </span>

@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import TypeParagraph from '../TypeParagraph/TypeParagraph';
+import Timer from '../Timer/Timer';
 
 export interface TypeChar {
     char: string;
@@ -17,7 +18,6 @@ const formatTime = (totalSeconds: number) => {
 };
 
 const TypeTest = () => {
-    // TODO: Reset Test functionality
     /* TODO: Calculate test results:
         Typing Speed, Typing Accuracy, Typing Error Rate, Typing Rollovers,
         Typing KSPM, Typing GWPM, Typing NWPM, Typing Consistency, Timed Segments*/
@@ -61,9 +61,13 @@ const TypeTest = () => {
         }
     }
 
-    // Time Handlers
-    const handleToggleTime = () => {
-        setIsTestStarted(!isTestStarted);
+    // Timer Handlers
+    const handleStartTest = () => {
+        setIsTestStarted(true);
+    }
+
+    const handlePauseTest = () => {
+        setIsTestStarted(false);
     }
 
     const handleEndTest = () => {
@@ -72,7 +76,10 @@ const TypeTest = () => {
     }
 
     const handleResetTimer = () => {
-        setIsTestStarted(false);
+        setIsTestStarted(false)
+        setIsTestEnded(false);
+        setTestRecord([])
+        setWrongTypedChar([]);
         setTime(0);
     };
 
@@ -98,22 +105,21 @@ const TypeTest = () => {
     }, [testRecord]);
 
     return (<div className='bg-white text-black'>
-        <h1>TypeTest</h1>
         <TypeParagraph
             text={testText}
             wrongTypedChar={wrongTypedChar}
             time={time}
             isTestStarted={isTestStarted}
             isTestEnded={isTestEnded}
+            testRecord={testRecord}
             handleCorrectKey={handleCorrectKey}
             handleIncorrectKey={handleIncorrectKey}
             handleBackSpace={handleBackSpace}
-            handleToggleTime={handleToggleTime}
             handleEndTest={handleEndTest}
-        ></TypeParagraph>
-        {/*TODO: Create Timer Display Component*/}
-        <p>{formatTime(time)}</p>
-
+            handleStartTest={handleStartTest}
+            handlePauseTest={handlePauseTest}
+        />
+        <Timer time={formatTime(time)} handleResetTimer={handleResetTimer}/>
     </div>);
 }
 

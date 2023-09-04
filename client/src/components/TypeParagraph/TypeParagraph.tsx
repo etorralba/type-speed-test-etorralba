@@ -7,11 +7,13 @@ type TypeParagraphProps = {
     time: number
     isTestStarted: boolean
     isTestEnded: boolean
+    testRecord: TypeChar[]
     handleCorrectKey: (record: TypeChar) => void
     handleIncorrectKey: (wrongTypedChar: string) => void
     handleBackSpace: () => void
-    handleToggleTime: () => void
     handleEndTest: () => void
+    handleStartTest: () => void
+    handlePauseTest: () => void
 }
 
 const TypeParagraph = (props: TypeParagraphProps) => {
@@ -21,11 +23,13 @@ const TypeParagraph = (props: TypeParagraphProps) => {
         time,
         isTestEnded,
         isTestStarted,
+        testRecord,
         handleCorrectKey,
         handleIncorrectKey,
         handleBackSpace,
-        handleToggleTime,
-        handleEndTest
+        handleEndTest,
+        handleStartTest,
+        handlePauseTest
     } = props
     const splitText = text.split('')
 
@@ -41,9 +45,7 @@ const TypeParagraph = (props: TypeParagraphProps) => {
         const handleKeyDown = (event: KeyboardEvent) => {
             const {key} = event
             if (!SPECIAL_KEYS.includes(key) && !isTestEnded) {
-                if (!isTestStarted) {
-                    handleToggleTime()
-                }
+                handleStartTest()
                 // If the key pressed is not a special key and is no wrong typed character
                 if (parseKeys(key) === splitText[currentCharacterIndex] && wrongTypedChar.length === 0) {
                     moveToNextCharacter()
@@ -102,10 +104,22 @@ const TypeParagraph = (props: TypeParagraphProps) => {
         document.addEventListener('keydown', handleKeyDown)
         parseDisplayText()
 
+        if (testRecord.length === 0) {
+            setCurrentCharacterIndex(0)
+        }
+
         return () => {
             document.removeEventListener('keydown', handleKeyDown)
         }
-    }, [currentCharacterIndex, wrongTypedChar, time])
+    }, [currentCharacterIndex, wrongTypedChar, time, testRecord, isTestEnded])
+
+    // Handle window focus
+    useEffect(() => {
+        window.addEventListener('blur', handlePauseTest)
+        return () => {
+            window.removeEventListener('blur', handlePauseTest)
+        }
+    }, [isTestStarted])
 
     return (<span className="">
       {displayText.map((char, index) => {

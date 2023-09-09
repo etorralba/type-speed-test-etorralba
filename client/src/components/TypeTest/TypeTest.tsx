@@ -4,57 +4,35 @@ import Timer from '../Timer/Timer';
 import {formatTime} from '@/utils';
 
 export interface TypeChar {
-    char: string;
+    textChar: string;
+    attemptChar: string | undefined;
     time: number;
+    isCorrect: boolean;
+    attempt: number;
 }
 
 const TypeTest = () => {
-    /* TODO: Calculate test results:
-        Typing Speed, Typing Accuracy, Typing Error Rate, Typing Rollovers,
-        Typing KSPM, Typing GWPM, Typing NWPM, Typing Consistency, Timed Segments*/
-    // TODO: Added Reset Test button
-    // TODO: Pause Test functionality
 
     // State for global test record
-    const [testRecord, setTestRecord] = useState<TypeChar[]>([]);
-    const [testText, setTestText] = useState<string>('Neque');
-    const [wrongTypedChar, setWrongTypedChar] = useState<string[]>([]);
+    const [text, setText] = useState<string>('Lorem Ipsum is simply dummy text.');
+    const [testText, setTestText] = useState<TypeChar[]>([]);
+
     const [isTestStarted, setIsTestStarted] = useState<boolean>(false);
     const [isTestEnded, setIsTestEnded] = useState<boolean>(false);
     const [time, setTime] = useState<number>(0);
 
     // Type Handlers
-    // Handle correct key
-    const handleCorrectKey = (record: TypeChar) => {
-        const newTestRecord = [...testRecord];
-        newTestRecord.push(record);
-        setTestRecord(newTestRecord);
-    }
-
-    // Handle incorrect key
-    const handleIncorrectKey = (key: string) => {
-        const newWrongTypedChar = [...wrongTypedChar];
-        newWrongTypedChar.push(key);
-        setWrongTypedChar(newWrongTypedChar);
-    }
-
-    // Handle backspace key
-    const handleBackSpace = () => {
-        if (wrongTypedChar.length > 0) {
-            const newWrongTypedChar = [...wrongTypedChar];
-            newWrongTypedChar.pop();
-            setWrongTypedChar(newWrongTypedChar);
-        } else {
-            const newTestRecord = [...testRecord];
-            newTestRecord.pop();
-            console.log("newTestRecord: ", newTestRecord)
-            setTestRecord(newTestRecord);
-        }
+    // Handle character typed
+    const handleTypedChar = (record: TypeChar, index: number) => {
+        const newTestText = [...testText];
+        newTestText[index] = record;
+        setTestText(newTestText);
     }
 
     // Timer Handlers
     const handleStartTest = () => {
         setIsTestStarted(true);
+        parseText(text);
     }
 
     const handlePauseTest = () => {
@@ -66,13 +44,35 @@ const TypeTest = () => {
         setIsTestEnded(true);
     }
 
+    // Reset Test
     const handleResetTimer = () => {
         setIsTestStarted(false)
         setIsTestEnded(false);
-        setTestRecord([])
-        setWrongTypedChar([]);
+        parseText(text);
         setTime(0);
     };
+
+    // Parse text into testText
+    const parseText = (text: string) => {
+        //Todo: Add error handling
+        const splitText = text.split('');
+        const parsedText = splitText.map((char) => {
+            return {
+                textChar: char,
+                attemptChar: undefined,
+                time: 0,
+                isCorrect: false,
+                attempt: 0
+            } as TypeChar
+        })
+        setTestText(parsedText);
+    }
+
+    useEffect(() => {
+        parseText(text);
+    }, []);
+
+    //TODO: Move timer logic to separated component
 
     // Timer logic
     useEffect(() => {
@@ -91,21 +91,14 @@ const TypeTest = () => {
         };
     }, [isTestStarted, time]);
 
-    useEffect(() => {
-        console.log("testRecord: ", testRecord);
-    }, [testRecord]);
-
     return (<div className='bg-white text-black'>
         <TypeParagraph
-            text={testText}
-            wrongTypedChar={wrongTypedChar}
+            text={text}
             time={time}
             isTestStarted={isTestStarted}
             isTestEnded={isTestEnded}
-            testRecord={testRecord}
-            handleCorrectKey={handleCorrectKey}
-            handleIncorrectKey={handleIncorrectKey}
-            handleBackSpace={handleBackSpace}
+            testText={testText}
+            handleTypedChar={handleTypedChar}
             handleEndTest={handleEndTest}
             handleStartTest={handleStartTest}
             handlePauseTest={handlePauseTest}

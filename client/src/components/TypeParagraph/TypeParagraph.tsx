@@ -2,15 +2,11 @@ import React, {useEffect, useState} from 'react'
 import {TypeChar} from '../TypeTest/TypeTest'
 
 type TypeParagraphProps = {
-    text: string
-    wrongTypedChar: string[]
     time: number
     isTestStarted: boolean
     isTestEnded: boolean
-    testRecord: TypeChar[]
-    handleCorrectKey: (record: TypeChar) => void
-    handleIncorrectKey: (wrongTypedChar: string) => void
-    handleBackSpace: () => void
+    testText: TypeChar[]
+    handleTypedChar: (record: TypeChar, index: number) => void
     handleEndTest: () => void
     handleStartTest: () => void
     handlePauseTest: () => void
@@ -18,63 +14,50 @@ type TypeParagraphProps = {
 
 const TypeParagraph = (props: TypeParagraphProps) => {
     const {
-        text,
-        wrongTypedChar,
-        time,
-        isTestEnded,
-        isTestStarted,
-        testRecord,
-        handleCorrectKey,
-        handleIncorrectKey,
-        handleBackSpace,
-        handleEndTest,
-        handleStartTest,
-        handlePauseTest
+        time, isTestEnded, isTestStarted, testText, handleTypedChar, handleEndTest, handleStartTest, handlePauseTest,
     } = props
-    const splitText = text.split('')
 
     // State for keys pressed and current character
     const [currentCharacterIndex, setCurrentCharacterIndex] = useState(0)
-    const [displayText, setDisplayText] = useState<string[]>([...splitText])
 
     // Handle key presses
     useEffect(() => {
         const SPECIAL_KEYS = ['Shift', 'Control', 'Alt', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'CapsLock', 'Meta', 'Unidentified',]
-
         // Event listener to handle key presses
         const handleKeyDown = (event: KeyboardEvent) => {
             const {key} = event
             if (!SPECIAL_KEYS.includes(key) && !isTestEnded) {
-                handleStartTest()
-                // If the key pressed is not a special key and is no wrong typed character
-                if (parseKeys(key) === splitText[currentCharacterIndex] && wrongTypedChar.length === 0) {
-                    moveToNextCharacter()
-                    handleCorrectKey({char: parseKeys(key), time: time})
-                    return
-                } else if (key === 'Backspace') {
-                    if (wrongTypedChar.length > 0) {
-                        handleBackSpace()
-                        return
-                    }
+                if (!isTestStarted) {
+                    handleStartTest()
+                }
+                if (key === 'Backspace') {
                     moveToPrevCharacter()
-                    handleBackSpace()
                     return
                 }
-                handleIncorrectKey(parseKeys(key))
+                moveToNextCharacter(parseKeys(key))
             }
         }
 
+        // TODO: Move this to a utils file
         // Parse special keys to string value
         const parseKeys = (key: string) => {
             return key === 'Enter' ? '\n' : key
         }
 
         // Moves to the next character and updates state
-        const moveToNextCharacter = () => {
+        const moveToNextCharacter = (key) => {
+            handleTypedChar({
+                textChar: testText[currentCharacterIndex].textChar,
+                attemptChar: key,
+                time: time,
+                isCorrect: testText[currentCharacterIndex].textChar === key,
+                attempt: testText[currentCharacterIndex].attempt + 1
+            }, currentCharacterIndex)
+
             const newPosition = currentCharacterIndex + 1
             setCurrentCharacterIndex(newPosition)
 
-            if (newPosition === splitText.length) {
+            if (newPosition === testText.length) {
                 handleEndTest()
                 console.log('Test ended!')
             }
@@ -82,36 +65,26 @@ const TypeParagraph = (props: TypeParagraphProps) => {
 
         // Moves to the previous character and updates state
         const moveToPrevCharacter = () => {
-            if (currentCharacterIndex === 0) {
+            const newPosition = currentCharacterIndex - 1
+            if (newPosition < 0) {
+                setCurrentCharacterIndex(0)
                 return
             }
-            const newPosition = currentCharacterIndex - 1
+
             setCurrentCharacterIndex(newPosition)
-        }
 
-        // Parses the display text based on the current state
-        const parseDisplayText = () => {
-            // Calculate the new display text based on the current state
-            const newDisplayText = [...splitText]
-
-            // Insert the keysPressed characters at the currentCharacter.position
-            newDisplayText.splice(currentCharacterIndex, 0, ...wrongTypedChar)
-
-            // Update the displayText state using the calculated newDisplayText
-            setDisplayText(newDisplayText)
+            handleTypedChar({
+                textChar: testText[newPosition].textChar,
+                attemptChar: undefined, time: time, isCorrect: false, attempt: testText[newPosition].attempt + 1 // Use newPosition here
+            }, newPosition)
         }
 
         document.addEventListener('keydown', handleKeyDown)
-        parseDisplayText()
-
-        if (testRecord.length === 0) {
-            setCurrentCharacterIndex(0)
-        }
 
         return () => {
             document.removeEventListener('keydown', handleKeyDown)
         }
-    }, [currentCharacterIndex, wrongTypedChar, time, testRecord, isTestEnded])
+    }, [currentCharacterIndex, time, testText, isTestEnded])
 
     // Handle window focus
     useEffect(() => {
@@ -121,24 +94,29 @@ const TypeParagraph = (props: TypeParagraphProps) => {
         }
     }, [isTestStarted])
 
+    useEffect(() => {
+        const text = testText.map((char) => char.textChar).join('')
+        console.log("text: ", text)
+        console.log("currentCharacterIndex: ", currentCharacterIndex)
+    }, [currentCharacterIndex, testText]);
     return (<span className="">
-      {displayText.map((char, index) => {
-          const keyPressedLength = wrongTypedChar.length
+      {testText.map((char, index) => {
           let charStyle: string
-          if (index <= currentCharacterIndex + keyPressedLength - 1 && index >= currentCharacterIndex) {
-              // Wrong
-              charStyle = `bg-red-400`
-          } else if (index < currentCharacterIndex) {
-              // Correct
-              charStyle = `bg-green-400`
-          } else {
-              // Remaining
-              charStyle = `bg-gray-400`
-          }
+          if (index > currentCharacterIndex) {
+              charStyle = 'text-gray-400' // Future characters
+          } else if (index === currentCharacterIndex) {
+              charStyle = 'text-blue-500' // Current character
 
-          return (<span className={charStyle} key={char + index}>
-            {char}
-              {char == '\n' ? <br/> : <></>}
+          } else if (char.attempt > 1 && char.isCorrect) {
+              charStyle = 'text-yellow-500' // Corrected character
+          } else if (char.isCorrect) {
+              charStyle = 'text-green-500' // Correct character
+          } else {
+              charStyle = 'text-red-500' // Wrong character
+          }
+          return (<span className={charStyle} key={index}>
+            {char.attemptChar ? char.attemptChar : char.textChar}
+              {char.attemptChar == '\n' ? <br/> : <></>}
           </span>)
       })}
     </span>)

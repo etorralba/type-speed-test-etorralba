@@ -1,14 +1,14 @@
 import React, {useEffect} from 'react';
 import {formatTime} from '@/utils';
 
-interface TimerProps {
+interface ITimerProps {
     time: number;
     isTestStarted: boolean;
     handleSetTime: (time: (prevTime: any) => any) => void;
     handleResetTimer: () => void;
 }
 
-const Timer = (props: TimerProps) => {
+const Timer = (props: ITimerProps) => {
     const {time, handleSetTime, isTestStarted, handleResetTimer} = props;
 
     useEffect(() => {

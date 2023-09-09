@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import TypeParagraph from '../TypeParagraph/TypeParagraph';
 import Timer from '../Timer/Timer';
+import Results from '../Results/Results';
 
-export interface TypeChar {
+export interface ITypeChar {
     textChar: string;
     attemptChar: string | undefined;
     time: number;
@@ -10,19 +11,48 @@ export interface TypeChar {
     attempt: number;
 }
 
+export interface ITestResults {
+    typingCPM: number;
+    typingWPM: number;
+    typingAccuracy: number;
+    typingErrorRate: number;
+    typingRollovers: number;
+    typingKSPM: number;
+    typingGWPM: number;
+    typingNWPM: number;
+    typingConsistency: number;
+}
+
 const TypeTest = () => {
 
     // State for global test record
     const [text, setText] = useState<string>('Lorem Ipsum is simply dummy text.');
-    const [testText, setTestText] = useState<TypeChar[]>([]);
+    const [testText, setTestText] = useState<ITypeChar[]>([]);
     const [currentCharacterIndex, setCurrentCharacterIndex] = useState(0)
 
     const [isTestStarted, setIsTestStarted] = useState<boolean>(false);
     const [isTestEnded, setIsTestEnded] = useState<boolean>(false);
     const [time, setTime] = useState<number>(0);
 
+    const [testResults, setTestResults] = useState<ITestResults>({
+        typingCPM: 0,
+        typingWPM: 0,
+        typingAccuracy: 0,
+        typingErrorRate: 0,
+        typingRollovers: 0,
+        typingKSPM: 0,
+        typingGWPM: 0,
+        typingNWPM: 0,
+        typingConsistency: 0
+    });
+
+    // Handle test results
+    const handleTestResults = (results: ITestResults) => {
+        setTestResults(results);
+    }
+
     // Handle typed character
-    const handleTypedChar = (record: TypeChar, index: number) => {
+    const handleTypedChar = (record: ITypeChar, index: number) => {
         setTestText((prevTestText) => {
             const updatedTestText = [...prevTestText];
             updatedTestText[index] = record;
@@ -80,7 +110,7 @@ const TypeTest = () => {
                 time: 0,
                 isCorrect: false,
                 attempt: 0
-            })) as TypeChar[];
+            })) as ITypeChar[];
 
             setTestText(parsedText);
         } catch (e) {
@@ -110,6 +140,12 @@ const TypeTest = () => {
             isTestStarted={isTestStarted}
             handleSetTime={handleSetTime}
             handleResetTimer={handleResetTimer}
+        />
+        <Results
+            time={time}
+            testText={testText}
+            testResults={testResults}
+            handleTestResults={handleTestResults}
         />
     </div>);
 }

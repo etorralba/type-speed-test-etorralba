@@ -1,21 +1,21 @@
 import React, {useEffect} from 'react'
 import {parseKeys} from '@/utils'
-import {TypeChar} from '../TypeTest/TypeTest'
+import {ITypeChar, TypeChar} from '../TypeTest/TypeTest'
 
-type TypeParagraphProps = {
+type ITypeParagraphProps = {
     handleEndTest: () => void
     handlePauseTest: () => void
     handleStartTest: () => void
-    handleTypedChar: (record: TypeChar, index: number) => void
+    handleTypedChar: (record: ITypeChar, index: number) => void
     handleCurrentCharacter: (index: number) => void
     isTestEnded: boolean
     isTestStarted: boolean
-    testText: TypeChar[]
+    testText: ITypeChar[]
     time: number
     currentCharacterIndex: number
 }
 
-const TypeParagraph = (props: TypeParagraphProps) => {
+const TypeParagraph = (props: ITypeParagraphProps) => {
     const {
         time, isTestEnded, isTestStarted, testText, currentCharacterIndex, handleCurrentCharacter, handleTypedChar, handleEndTest, handleStartTest, handlePauseTest,
     } = props

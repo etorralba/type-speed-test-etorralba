@@ -1,25 +1,23 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect} from 'react'
 import {TypeChar} from '../TypeTest/TypeTest'
-import timer from "@/components/Timer/Timer";
 
 type TypeParagraphProps = {
     handleEndTest: () => void
     handlePauseTest: () => void
     handleStartTest: () => void
     handleTypedChar: (record: TypeChar, index: number) => void
+    handleCurrentCharacter: (index: number) => void
     isTestEnded: boolean
     isTestStarted: boolean
     testText: TypeChar[]
     time: number
+    currentCharacterIndex: number
 }
 
 const TypeParagraph = (props: TypeParagraphProps) => {
     const {
-        time, isTestEnded, isTestStarted, testText, handleTypedChar, handleEndTest, handleStartTest, handlePauseTest,
+        time, isTestEnded, isTestStarted, testText, currentCharacterIndex, handleCurrentCharacter, handleTypedChar, handleEndTest, handleStartTest, handlePauseTest,
     } = props
-
-    // State for keys pressed and current character
-    const [currentCharacterIndex, setCurrentCharacterIndex] = useState(0)
 
     // Handle key presses
     useEffect(() => {
@@ -52,7 +50,7 @@ const TypeParagraph = (props: TypeParagraphProps) => {
             }, currentCharacterIndex)
 
             const newPosition = currentCharacterIndex + 1
-            setCurrentCharacterIndex(newPosition)
+            handleCurrentCharacter(newPosition)
 
             if (newPosition === testText.length) {
                 handleEndTest()
@@ -64,11 +62,11 @@ const TypeParagraph = (props: TypeParagraphProps) => {
         const moveToPrevCharacter = () => {
             const newPosition = currentCharacterIndex - 1
             if (newPosition < 0) {
-                setCurrentCharacterIndex(0)
+                handleCurrentCharacter(0)
                 return
             }
 
-            setCurrentCharacterIndex(newPosition)
+            handleCurrentCharacter(newPosition)
 
             handleTypedChar({
                 textChar: testText[newPosition].textChar, attemptChar: undefined, time: time, isCorrect: false, attempt: testText[newPosition].attempt + 1 // Use newPosition here

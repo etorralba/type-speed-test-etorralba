@@ -9,7 +9,7 @@ interface TimerProps {
 }
 
 const Timer = (props: TimerProps) => {
-    const {time, handleSetTime, isTestStarted, handleResetTimer } = props;
+    const {time, handleSetTime, isTestStarted, handleResetTimer} = props;
 
     useEffect(() => {
         let interval: string | number | NodeJS.Timer | undefined;

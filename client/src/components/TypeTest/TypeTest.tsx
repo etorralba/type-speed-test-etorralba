@@ -68,14 +68,24 @@ const TypeTest = () => {
 
     // Parse text into testText
     const parseText = (text: string) => {
-        //Todo: Add error handling
-        const splitText = text.split('');
-        const parsedText = splitText.map((char) => {
-            return {
-                textChar: char, attemptChar: undefined, time: 0, isCorrect: false, attempt: 0
-            } as TypeChar
-        })
-        setTestText(parsedText);
+        try {
+            if (typeof text !== 'string') {
+                throw new Error('Text must be a string');
+            }
+
+            const splitText = text.split('');
+            const parsedText = splitText.map((char) => ({
+                textChar: char,
+                attemptChar: undefined,
+                time: 0,
+                isCorrect: false,
+                attempt: 0
+            })) as TypeChar[];
+
+            setTestText(parsedText);
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     useEffect(() => {

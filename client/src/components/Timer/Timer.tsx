@@ -23,7 +23,7 @@ const Timer = (props: TimerProps) => {
         return () => {
             clearInterval(interval);
         };
-    }, [isTestStarted, handleSetTime]);
+    }, [isTestStarted]);
 
     return (<div>
         <h1>{formatTime(time)}</h1>

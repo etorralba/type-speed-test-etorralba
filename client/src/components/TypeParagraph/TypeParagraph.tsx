@@ -1,4 +1,5 @@
 import React, {useEffect} from 'react'
+import {parseKeys} from '@/utils'
 import {TypeChar} from '../TypeTest/TypeTest'
 
 type TypeParagraphProps = {
@@ -35,12 +36,6 @@ const TypeParagraph = (props: TypeParagraphProps) => {
                 }
                 moveToNextCharacter(parseKeys(key))
             }
-        }
-
-        // TODO: Move this to a utils file
-        // Parse special keys to string value
-        const parseKeys = (key: string) => {
-            return key === 'Enter' ? '\n' : key
         }
 
         // Moves to the next character and updates state

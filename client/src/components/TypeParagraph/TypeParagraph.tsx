@@ -2,14 +2,15 @@ import React, {useEffect, useState} from 'react'
 import {TypeChar} from '../TypeTest/TypeTest'
 
 type TypeParagraphProps = {
-    time: number
-    isTestStarted: boolean
-    isTestEnded: boolean
-    testText: TypeChar[]
-    handleTypedChar: (record: TypeChar, index: number) => void
     handleEndTest: () => void
-    handleStartTest: () => void
     handlePauseTest: () => void
+    handleStartTest: () => void
+    // eslint-disable-next-line no-unused-vars
+    handleTypedChar: (record: TypeChar, index: number) => void
+    isTestEnded: boolean
+    isTestStarted: boolean
+    testText: TypeChar[]
+    time: number
 }
 
 const TypeParagraph = (props: TypeParagraphProps) => {
@@ -45,7 +46,7 @@ const TypeParagraph = (props: TypeParagraphProps) => {
         }
 
         // Moves to the next character and updates state
-        const moveToNextCharacter = (key) => {
+        const moveToNextCharacter = (key: string) => {
             handleTypedChar({
                 textChar: testText[currentCharacterIndex].textChar,
                 attemptChar: key,

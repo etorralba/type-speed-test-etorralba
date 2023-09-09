@@ -24,9 +24,11 @@ const TypeTest = () => {
     // Type Handlers
     // Handle character typed
     const handleTypedChar = (record: TypeChar, index: number) => {
-        const newTestText = [...testText];
-        newTestText[index] = record;
-        setTestText(newTestText);
+        setTestText((prevTestText) => {
+            const updatedTestText = [...prevTestText];
+            updatedTestText[index] = record;
+            return updatedTestText;
+        });
     }
 
     // Timer Handlers
@@ -76,14 +78,13 @@ const TypeTest = () => {
 
     // Timer logic
     useEffect(() => {
+        // eslint-disable-next-line no-undef
         let interval: NodeJS.Timeout;
 
         if (isTestStarted) {
             interval = setInterval(() => {
                 setTime((prevTime) => prevTime + 0.01); // Add 0.01 seconds (10 milliseconds)
             }, 10);
-        } else {
-            clearInterval(interval);
         }
 
         return () => {
@@ -93,7 +94,6 @@ const TypeTest = () => {
 
     return (<div className='bg-white text-black'>
         <TypeParagraph
-            text={text}
             time={time}
             isTestStarted={isTestStarted}
             isTestEnded={isTestEnded}

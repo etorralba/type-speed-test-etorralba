@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react'
 import {TypeChar} from '../TypeTest/TypeTest'
+import timer from "@/components/Timer/Timer";
 
 type TypeParagraphProps = {
     handleEndTest: () => void
     handlePauseTest: () => void
     handleStartTest: () => void
-    // eslint-disable-next-line no-unused-vars
     handleTypedChar: (record: TypeChar, index: number) => void
     isTestEnded: boolean
     isTestStarted: boolean
@@ -48,11 +48,7 @@ const TypeParagraph = (props: TypeParagraphProps) => {
         // Moves to the next character and updates state
         const moveToNextCharacter = (key: string) => {
             handleTypedChar({
-                textChar: testText[currentCharacterIndex].textChar,
-                attemptChar: key,
-                time: time,
-                isCorrect: testText[currentCharacterIndex].textChar === key,
-                attempt: testText[currentCharacterIndex].attempt + 1
+                textChar: testText[currentCharacterIndex].textChar, attemptChar: key, time: time, isCorrect: testText[currentCharacterIndex].textChar === key, attempt: testText[currentCharacterIndex].attempt + 1
             }, currentCharacterIndex)
 
             const newPosition = currentCharacterIndex + 1
@@ -75,8 +71,7 @@ const TypeParagraph = (props: TypeParagraphProps) => {
             setCurrentCharacterIndex(newPosition)
 
             handleTypedChar({
-                textChar: testText[newPosition].textChar,
-                attemptChar: undefined, time: time, isCorrect: false, attempt: testText[newPosition].attempt + 1 // Use newPosition here
+                textChar: testText[newPosition].textChar, attemptChar: undefined, time: time, isCorrect: false, attempt: testText[newPosition].attempt + 1 // Use newPosition here
             }, newPosition)
         }
 

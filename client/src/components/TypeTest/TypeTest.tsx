@@ -21,8 +21,7 @@ const TypeTest = () => {
     const [isTestEnded, setIsTestEnded] = useState<boolean>(false);
     const [time, setTime] = useState<number>(0);
 
-    // Type Handlers
-    // Handle character typed
+    // Handle typed character
     const handleTypedChar = (record: TypeChar, index: number) => {
         setTestText((prevTestText) => {
             const updatedTestText = [...prevTestText];
@@ -31,16 +30,23 @@ const TypeTest = () => {
         });
     }
 
-    // Timer Handlers
+    // Set time
+    const handleSetTime = (time: (prevTime: any) => any) => {
+        setTime(time);
+    }
+
+    // Start Test
     const handleStartTest = () => {
         setIsTestStarted(true);
         parseText(text);
     }
 
+    // Pause Test
     const handlePauseTest = () => {
         setIsTestStarted(false);
     }
 
+    // End Test
     const handleEndTest = () => {
         setIsTestStarted(false);
         setIsTestEnded(true);
@@ -74,24 +80,6 @@ const TypeTest = () => {
         parseText(text);
     }, []);
 
-    //TODO: Move timer logic to separated component
-
-    // Timer logic
-    useEffect(() => {
-        // eslint-disable-next-line no-undef
-        let interval: NodeJS.Timeout;
-
-        if (isTestStarted) {
-            interval = setInterval(() => {
-                setTime((prevTime) => prevTime + 0.01); // Add 0.01 seconds (10 milliseconds)
-            }, 10);
-        }
-
-        return () => {
-            clearInterval(interval);
-        };
-    }, [isTestStarted, time]);
-
     return (<div className='bg-white text-black'>
         <TypeParagraph
             time={time}
@@ -103,7 +91,12 @@ const TypeTest = () => {
             handleStartTest={handleStartTest}
             handlePauseTest={handlePauseTest}
         />
-        <Timer time={formatTime(time)} handleResetTimer={handleResetTimer}/>
+        <Timer
+            time={time}
+            isTestStarted={isTestStarted}
+            handleSetTime={handleSetTime}
+            handleResetTimer={handleResetTimer}
+        />
     </div>);
 }
 
